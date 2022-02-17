@@ -89,6 +89,7 @@ def authorized():
             request.args['code'],
             scopes=Config.SCOPE,
             redirect_uri=url_for('authorized', _external=True, _scheme='https'))
+        result = None
         if "error" in result:
             return render_template("auth_error.html", result=result)
         session["user"] = result.get("id_token_claims")
@@ -107,8 +108,8 @@ def logout():
         session.clear()
         # Also logout from your tenant's web session
         return redirect(
-            Config.AUTHORITY + '/oauth2/v2.0/logout' +
-            '?post_logout_redirect_uri=' + url_for('login', _external=True))
+            Config.AUTHORITY + "/oauth2/v2.0/logout" +
+            "?post_logout_redirect_uri=" + url_for("login", _external=True))
 
     return redirect(url_for('login'))
 
