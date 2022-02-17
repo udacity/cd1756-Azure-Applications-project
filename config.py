@@ -32,7 +32,7 @@ class Config(object):
 
     CLIENT_ID = "85c71b3c-219d-4db2-ad6b-8f7ff1ca697c"
 
-    REDIRECT_PATH = "/getAToken"  # Used to form an absolute URL; must match to app's redirect_uri set in AAD
+    REDIRECT_PATH = "https://appservice-helloworld.azurewebsites.net/getAToken"  # Used to form an absolute URL; must match to app's redirect_uri set in AAD
 
     # You can find the proper permission names from this document
     # https://docs.microsoft.com/en-us/graph/permissions-reference
