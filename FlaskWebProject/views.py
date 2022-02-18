@@ -20,7 +20,7 @@ imageSourceUrl = 'https://'+ app.config['BLOB_ACCOUNT']  + '.blob.core.windows.n
 @login_required
 def home():
     log = request.values.get('log_button')
-    
+
     if log:
         if log == 'info':
             app.logger.info('No issue.')
@@ -131,8 +131,6 @@ def _load_cache():
     return cache
 
 def _save_cache(cache):
-    if cache.has_state_changed:
-       session['token_cache'] = cache.serialize()
     pass
 
 def _build_msal_app(cache=None, authority=None):
