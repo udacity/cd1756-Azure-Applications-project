@@ -19,18 +19,6 @@ imageSourceUrl = 'https://'+ app.config['BLOB_ACCOUNT']  + '.blob.core.windows.n
 @app.route('/home')
 @login_required
 def home():
-    log = request.values.get('log_button')
-
-    if log:
-        if log == 'info':
-            app.logger.info('No issue.')
-        elif log == 'warning':
-            app.logger.warning('Warning occurred.')
-        elif log == 'error':
-            app.logger.error('Error occurred.')
-        elif log == 'critical':
-            app.logger.critical('Critical error occurred.')
-
     user = User.query.filter_by(username=current_user.username).first_or_404()
     posts = Post.query.all()
     
@@ -97,7 +85,9 @@ def authorized():
     if request.args.get('state') != session.get("state"):
         return redirect(url_for("home"))  # No-OP. Goes back to Index page
     if "error" in request.args:  # Authentication/Authorization failure
+        app.logger.info('failed to login', user.username)
         return render_template("auth_error.html", result=request.args)
+        
     if request.args.get('code'):
         cache = _load_cache()
         result = _build_msal_app(cache=cache).acquire_token_by_authorization_code(
