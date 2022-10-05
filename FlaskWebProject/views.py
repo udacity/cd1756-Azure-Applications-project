@@ -67,8 +67,10 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
+            # TODO: Log invalid attempt
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
+        # TODO: Log valid attempt
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('home')
@@ -92,6 +94,7 @@ def authorized():
         session["user"] = result.get("id_token_claims")
         # Note: In a real app, we'd use the 'name' property from session["user"] below
         # Here, we'll use the admin username for anyone who is authenticated by MS
+        # TODO: Modify the username value to be the 'name' property from session["user"]
         user = User.query.filter_by(username="admin").first()
         login_user(user)
         _save_cache(cache)

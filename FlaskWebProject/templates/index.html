@@ -22,6 +22,7 @@
                 <td>{{ post.author }}</td>
                 <td>{{ post.image_path != None }}</td>
                 <td><a href="{{ url_for('post', id=post.id) }}">Edit Post</a></td>
+                {% comment %} # TODO: Add a button to delete post  {% endcomment %}
             </tr>
             {% endfor %}
         </table>

@@ -36,6 +36,7 @@ class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150))
+    # TODO: Add subtitle field
     author = db.Column(db.String(75))
     body = db.Column(db.String(800))
     image_path = db.Column(db.String(100))
@@ -66,3 +67,5 @@ class Post(db.Model):
         if new:
             db.session.add(self)
         db.session.commit()
+
+    # TODO: Add a funtion to delete an article
