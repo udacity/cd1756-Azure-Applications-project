@@ -93,7 +93,9 @@ def authorized():
         # Note: In a real app, we'd use the 'name' property from session["user"] below
         # Here, we'll use the admin username for anyone who is authenticated by MS
         # TODO: Auto create user if user doesn't exist in the system
-        user = User.query.filter_by(username="admin").first()
+        # user = User.query.filter_by(username="admin").first()
+        username = _get_username(session=session)
+        user = _create_user(username=username)
         login_user(user)
         _save_cache(cache)
     return redirect(url_for('home'))
@@ -111,10 +113,21 @@ def logout():
 
     return redirect(url_for('login'))
 
+def _get_username(session):
+    session_user = session['user']
+    preferrer_username = session_user['preferred_username']
+    username_without_domain = preferrer_username.split('@')[0]
+    return username_without_domain
+
 def _create_user(username):
     user = User.query.filter_by(username=username).first()
-    
-    return None
+    if user == None:
+        # TODO: Insert user into db
+        newUser = User()
+        newUser.save_changes(username=username)
+        return newUser
+    # TODO: Return user
+    return user
 
 def _load_cache():
     # TODO: Load the cache from `msal`, if it exists

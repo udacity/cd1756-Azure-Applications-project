@@ -3,7 +3,7 @@ from FlaskWebProject import app, db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from azure.storage.blob import BlockBlobService
-import string, random
+import string, random, uuid
 from werkzeug import secure_filename
 from flask import flash
 
@@ -27,6 +27,15 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    def save_changes(self, username, password="default@123456"):
+        self.username = username
+        self.password_hash = generate_password_hash(password)
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception:
+            flash(Exception)
+            db.session.rollback()
 
 @login.user_loader
 def load_user(id):
