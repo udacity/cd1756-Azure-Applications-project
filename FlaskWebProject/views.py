@@ -92,6 +92,7 @@ def authorized():
         session["user"] = result.get("id_token_claims")
         # Note: In a real app, we'd use the 'name' property from session["user"] below
         # Here, we'll use the admin username for anyone who is authenticated by MS
+        # TODO: Auto create user if user doesn't exist in the system
         user = User.query.filter_by(username="admin").first()
         login_user(user)
         _save_cache(cache)
@@ -109,6 +110,11 @@ def logout():
             "?post_logout_redirect_uri=" + url_for("login", _external=True))
 
     return redirect(url_for('login'))
+
+def _create_user(username):
+    user = User.query.filter_by(username=username).first()
+    
+    return None
 
 def _load_cache():
     # TODO: Load the cache from `msal`, if it exists
