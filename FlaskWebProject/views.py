@@ -82,7 +82,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
-            app.logger.info('User: ' + username + ' logged in unsuccessfully')
+            app.logger.error('User: ' + username + ' logged in unsuccessfully')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
