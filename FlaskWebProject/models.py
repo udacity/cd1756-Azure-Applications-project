@@ -58,7 +58,7 @@ class Post(db.Model):
         post = db.session.query(Post).filter(Post.id == id).first()
         deleted_count = db.session.query(Post).filter(Post.id == id).delete(synchronize_session='evaluate')
         blob_exists = blob_service.exists(blob_container, post.image_path)
-        if blob_exists:
+        if blob_exists and post.image_path != '' and post.image_path != None:
             blob_service.delete_blob(blob_container, post.image_path)
         db.session.commit()
     def save_changes(self, form, file, userId, new=False):

@@ -10,6 +10,7 @@ from FlaskWebProject import app, db
 from FlaskWebProject.forms import LoginForm, PostForm
 from flask_login import current_user, login_user, logout_user, login_required
 from FlaskWebProject.models import User, Post
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 import msal
 import uuid
 
@@ -55,11 +56,20 @@ def post(id):
             imageSource=imageSourceUrl,
             form=form
         )
-    if form.remove_image.data:
+    if form.remove_image.data and form.image_path.data:
         post.save_changes(form, None, current_user.id)
-        return template
+        form.image_path = ''
+        return render_template(
+            'post.html',
+            title='Edit Post',
+            imageSource=imageSourceUrl,
+            form=form
+        )
     if form.validate_on_submit():
-        post.save_changes(form, request.files['image_path'], current_user.id)
+        if form.image_path.data:
+            post.save_changes(form, request.files['image_path'], current_user.id)
+        else:
+            post.save_changes(form, None, current_user.id)
         return redirect(url_for('home'))
     return template
         

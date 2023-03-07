@@ -47,9 +47,11 @@
                 <span style="color: red;">{{ error.join(form.image_path.errors) }}</span>
                 {% endfor %}
             </p>
+            {% if form.image_path.data %}
             <p>
                 {{ form.remove_image(class='btn btn-danger') }}
             </p>
+            {% endif %}
         </div>
     </div>
 </form>
