@@ -45,6 +45,7 @@ class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150))
+    subtitle = db.Column(db.String(150))
     author = db.Column(db.String(75))
     body = db.Column(db.String(800))
     image_path = db.Column(db.String(100))
@@ -53,12 +54,25 @@ class Post(db.Model):
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
-
+    def delete(id):
+        post = db.session.query(Post).filter(Post.id == id).first()
+        deleted_count = db.session.query(Post).filter(Post.id == id).delete(synchronize_session='evaluate')
+        blob_exists = blob_service.exists(blob_container, post.image_path)
+        if blob_exists:
+            blob_service.delete_blob(blob_container, post.image_path)
+        db.session.commit()
     def save_changes(self, form, file, userId, new=False):
         self.title = form.title.data
+        self.subtitle = form.subtitle.data
         self.author = form.author.data
         self.body = form.body.data
         self.user_id = userId
+
+        blob_exists = blob_service.exists(blob_container, self.image_path)
+        if file == None and self.image_path and blob_exists:
+            blob_service.delete_blob(blob_container, self.image_path)
+            self.image_path = ''
+            db.session.commit()
 
         if file:
             filename = secure_filename(file.filename);
@@ -67,7 +81,7 @@ class Post(db.Model):
             filename = Randomfilename + '.' + fileextension;
             try:
                 blob_service.create_blob_from_stream(blob_container, filename, file)
-                if(self.image_path):
+                if(self.image_path and blob_exists):
                     blob_service.delete_blob(blob_container, self.image_path)
             except Exception:
                 flash(Exception)
