@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from azure.storage.blob import BlockBlobService
 import string, random
-from werkzeug.utils import secure_filename
+from werkzeug import secure_filename
 from flask import flash
 
 blob_container = app.config['BLOB_CONTAINER']
@@ -36,6 +36,7 @@ class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150))
+    sub_title = db.Column(db.String(200), default=None)
     author = db.Column(db.String(75))
     body = db.Column(db.String(800))
     image_path = db.Column(db.String(100))
@@ -51,18 +52,34 @@ class Post(db.Model):
         self.body = form.body.data
         self.user_id = userId
 
-        if file:
+        if form.sub_title.data:
+            self.sub_title = form.sub_title.data
+
+        if form.remove_image_path.data == True:
+            self.delete_image()
+
+        elif file:
             filename = secure_filename(file.filename);
-            fileextension = filename.rsplit('.',1)[1];
-            Randomfilename = id_generator();
-            filename = Randomfilename + '.' + fileextension;
+            file_extension = filename.rsplit('.',1)[1];
+            RandomFilename = id_generator();
+            filename = RandomFilename + '.' + file_extension;
             try:
                 blob_service.create_blob_from_stream(blob_container, filename, file)
                 if(self.image_path):
                     blob_service.delete_blob(blob_container, self.image_path)
             except Exception:
                 flash(Exception)
+
             self.image_path =  filename
+
         if new:
             db.session.add(self)
+        db.session.commit()
+    
+    def delete_image(self):
+        try:
+            blob_service.delete_blob(blob_container, self.image_path)
+        except Exception:
+            flash(Exception) 
+        self.image_path = None
         db.session.commit()
